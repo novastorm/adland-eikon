@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  reverse-proxy:
+    image: nginx:1.21.4
+    volumes:
+      - type: bind
+        source: ./compose-service-configs/reverse-proxy/reverse-proxy.conf.template
+        target: /etc/nginx/templates/default.conf.template
+        read_only: true
+      - type: bind
+        source: ./compose-service-configs/reverse-proxy/proxy_params
+        target: /etc/nginx/proxy_params
+        read_only: true
+      - type: bind
+        source: ./compose-service-configs/reverse-proxy/upstream_params
+        target: /etc/nginx/upstream_params
+        read_only: true
+    ports:
+      - "${REVERSE_PROXY_EXTERNAL_PORT}:${REVERSE_PROXY_INTERNAL_PORT}"
+
+    # pass all the .env variables, so we don't have to manually specify each service
+    env_file: .env
+
+  postgres:
+    image: postgres:15.3
+    volumes:
+      - type: volume
+        source: postgres-database
+        target: /var/lib/postgresql/data
+    user: postgres
+    # use the following command if you want to print all queries
+    # command: ["postgres", "-c", "log_statement=all"]
+    ports:
+      - ${POSTGRES_EXTERNAL_PORT}:5432
+    environment:
+      POSTGRES_PASSWORD: "password"
+
+networks:
+  default:
+    name: docker-local-dev
+
+# specify the database directories as volumes, to avoid performance overhead of bind mounts
+# https://docs.docker.com/storage/volumes/
+# https://github.com/docker/for-mac/issues/4981#issuecomment-733796401
+# https://engageinteractive.co.uk/blog/making-docker-faster-on-mac
+volumes:
+  postgres-database:

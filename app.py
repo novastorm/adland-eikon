@@ -1,3 +1,7 @@
+CONFIG = dotenv_values(".env")
+if not CONFIG:
+    CONFIG = os.environ
+
 def etl():
     # Load CSV files
     # Process files to derive features
