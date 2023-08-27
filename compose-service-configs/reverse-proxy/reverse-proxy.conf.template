@@ -36,8 +36,8 @@ server {
     #access_log  /var/log/nginx/host.access.log  main;
 
     
-    location /api/ {
+    location / {
         include proxy_params;
-        proxy_pass http://apiserver/api/;
+        proxy_pass http://apiserver/;
     }
 }
