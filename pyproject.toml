@@ -1,0 +1,30 @@
+[project]
+name = "eikon-etl-package"
+version = "0.0.1"
+authors = [
+    {name = "Adland Lee", email = "adland.lee@gmail.com"},
+]
+dependencies = [
+    "Flask",
+    "celery",
+]
+description = "MyOme Technical Test"
+readme = "README.md"
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit~=2.15.0",
+]
+test = [
+    "eikon-etl-package[dev]",
+    "pyfakefs~=5.2.3",
+    "pytest~=7.4.0",
+    "pytest-cov~=4.1.0",
+]
+
+[options.packages.find]
+where = ["."]
+
+[tool.pytest.ini_options]
+python_files ="tests.py test_*.py *_tests.py"

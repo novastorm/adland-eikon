@@ -1,6 +1,41 @@
 version: "3.9"
 
 services:
+
+  apiserver:
+    build: .
+    image: eikon-etl
+    ports:
+      - "${APISERVER_EXTERNAL_PORT}:${APISERVER_INTERNAL_PORT}"
+    command: python manage.py run -h 0.0.0.0 -p ${APISERVER_INTERNAL_PORT}
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_DEBUG=1
+      - APP_SETTINGS=server.config.development
+      - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
+    depends_on:
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_started
+
+  celery-worker:
+    build: .
+    image: eikon-etl
+    command: celery -A server.tasks worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_DEBUG=1
+      - APP_SETTINGS=server.config.development
+      - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
+    depends_on:
+      - apiserver
+      - redis
+
   reverse-proxy:
     image: nginx:1.21.4
     volumes:
@@ -36,6 +71,19 @@ services:
     environment:
       POSTGRES_PASSWORD: "password"
 
+  redis:
+    image: redis:5.0.14-alpine
+    # redis defaults to RDB persistence (https://redis.io/topics/persistence)
+    # consider using AOF (--appendonly yes) if people still report issues with cached data
+    # disappearing after they restart their docker services
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+    volumes:
+      - type: volume
+        source: redis-volume
+        target: /data
+    ports:
+      - ${REDIS_EXTERNAL_PORT}:6379
+
 networks:
   default:
     name: docker-local-dev
@@ -46,3 +94,4 @@ networks:
 # https://engageinteractive.co.uk/blog/making-docker-faster-on-mac
 volumes:
   postgres-database:
+  redis-volume:
