@@ -12,7 +12,7 @@ services:
       - .:/app
     environment:
       - FLASK_DEBUG=1
-      - APP_SETTINGS=server.config.development
+      - APP_SETTINGS=config.development
       - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
       - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
     depends_on:
@@ -24,12 +24,12 @@ services:
   celery-worker:
     build: .
     image: eikon-etl
-    command: celery -A server.tasks worker --loglevel=info
+    command: celery -A tasks worker --loglevel=debug
     volumes:
       - .:/app
     environment:
       - FLASK_DEBUG=1
-      - APP_SETTINGS=server.config.development
+      - APP_SETTINGS=config.development
       - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
       - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
     depends_on:

@@ -1,6 +1,6 @@
-from flask import Blueprint
+from flask import Blueprint, jsonify
 
-from server.tasks import etl
+from tasks import etl
 
 main_blueprint = Blueprint("main", __name__)
 
@@ -10,4 +10,4 @@ main_blueprint = Blueprint("main", __name__)
 def trigger_etl():
     # Trigger your ETL process here
     etl.delay()
-    return {"message": "ETL process started"}, 200
+    return jsonify({"message": "ETL process started"}), 200

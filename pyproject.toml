@@ -7,6 +7,7 @@ authors = [
 dependencies = [
     "Flask",
     "celery",
+    "pandas",
 ]
 description = "MyOme Technical Test"
 readme = "README.md"
