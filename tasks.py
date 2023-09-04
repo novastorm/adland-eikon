@@ -10,6 +10,7 @@ celery_app = Celery(__name__)
 
 celery_app.config_from_object(os.getenv("APP_SETTINGS", "config.development"))
 
+
 def extract(data_path):
     sep = ",\t"
     # Load CSV files
@@ -25,10 +26,11 @@ def extract(data_path):
         "compounds_df": compounds_df
     }
 
+
 def transform(data):
     total_experiments_per_user = data['user_experiments_df'].groupby("user_id").agg(
         {"experiment_id": {len}}
-    )
+    ).reset_index()
     logging.debug("total_experiments_per_user")
     logging.debug(total_experiments_per_user)
 
@@ -62,9 +64,21 @@ def transform(data):
         "most_experimented_compound": most_experimented_compound,
     }
 
-def load_experiements_per_user_to_db(dataframe):
+
+def load_data(data):
+    # 1. Total number of experiments ran by each user.
+    # 2. Average number of experiments per user.
+    # 3. User's most commonly experimented compound.
+
     engine = connect_db()
-    dataframe.to_sql("experiments_per_user", con=engine, if_exists="replace")
+    total_experiments_per_user = data["total_experiments_per_user"]
+    avg_experiments_per_user = data["avg_experiments_per_user"]
+    most_experimented_compound = data["most_experimented_compound"]
+
+    total_experiments_per_user.to_sql("experiments_per_user", con=engine, if_exists="replace", index=False)
+    avg_experiments_per_user.to_sql("avg_experiments_per_user", con=engine, if_exists="replace", index=False)
+    most_experimented_compound.to_sql("most_experimented_compound", con=engine, if_exists="replace", index=False)
+
 
 @celery_app.task(name="etl")
 def etl():
@@ -77,16 +91,8 @@ def etl():
 
     # Process files to derive features
     t_data = transform(data)
-    total_experiments_per_user = t_data["total_experiments_per_user"]
-    avg_experiments_per_user = t_data["avg_experiments_per_user"]
-    most_experimented_compound = t_data["most_experimented_compound"]
-
-
-    # 1. Total number of experiments ran by each user.
-    # 2. Average number of experiments per user.
-    # 3. User's most commonly experimented compound.
 
     # Upload processed data into a database
-    load_experiements_per_user_to_db(total_experiments_per_user)
+    load_data(t_data)
 
     logging.debug("ETL process completed")
