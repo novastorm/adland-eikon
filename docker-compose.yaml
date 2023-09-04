@@ -16,6 +16,11 @@ services:
       - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
       - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
       - CELERY_ALWAYS_EAGER=True
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
     depends_on:
       redis:
         condition: service_started
@@ -33,6 +38,12 @@ services:
       - APP_SETTINGS=config.development
       - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
       - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - CELERY_ALWAYS_EAGER=True
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
     depends_on:
       - apiserver
       - redis
@@ -67,7 +78,7 @@ services:
         source: postgres-database
         target: /var/lib/postgresql/data
       - type: bind
-        source: ./compose-service-configs/postgres/init.sql
+        source: ./compose-service-configs/database/postgres/init.sql
         target: /docker-entrypoint-initdb.d/init.sql
         read_only: true
     user: postgres

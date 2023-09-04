@@ -8,6 +8,7 @@ dependencies = [
     "Flask",
     "celery",
     "pandas",
+    "psycopg",
 ]
 description = "MyOme Technical Test"
 readme = "README.md"
