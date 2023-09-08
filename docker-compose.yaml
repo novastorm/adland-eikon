@@ -7,10 +7,11 @@ services:
     image: eikon-etl
     ports:
       - "${APISERVER_EXTERNAL_PORT}:${APISERVER_INTERNAL_PORT}"
-    command: python manage.py run -h 0.0.0.0 -p ${APISERVER_INTERNAL_PORT}
-    volumes:
-      - .:/app
+#    command: python manage.py run -h 0.0.0.0 -p ${APISERVER_INTERNAL_PORT}
+#    volumes:
+#      - .:/app
     environment:
+      - APISERVER_INTERNAL_PORT
       - FLASK_DEBUG=1
       - APP_SETTINGS=config.development
       - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
@@ -30,9 +31,9 @@ services:
   celery-worker:
     build: .
     image: eikon-etl
-    command: celery -A tasks worker --loglevel=debug
-    volumes:
-      - .:/app
+    entrypoint: celery -A tasks worker --loglevel=debug
+#    volumes:
+#      - .:/app
     environment:
       - FLASK_DEBUG=1
       - APP_SETTINGS=config.development

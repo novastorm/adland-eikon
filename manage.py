@@ -10,5 +10,5 @@ app = create_app()
 cli = FlaskGroup(create_app=create_app)
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.WARNING)
     cli()
