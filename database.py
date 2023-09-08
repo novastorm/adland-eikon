@@ -3,15 +3,26 @@ import os
 
 from sqlalchemy import create_engine
 
+config_import = __import__(os.getenv("APP_SETTINGS", "config.development"), fromlist=[None])
+config = {
+    "username": getattr(config_import, "POSTGRES_USERNAME", "postgres"),
+    "password": getattr(config_import, "POSTGRES_PASSWORD", "password"),
+    "host": getattr(config_import, "POSTGRES_HOST", "localhost"),
+    "port": getattr(config_import, "POSTGRES_PORT", 5432),
+    "database": getattr(config_import, "POSTGRES_DB", "postgres"),
+}
+
 
 def connect_db():
     logging.info("Connecting to database")
+
+    logging.info("Config: {}".format(config))
     connection_uri = "postgresql://{username}:{password}@{host}:{port}/{db}".format(
-        username=os.environ.get("POSTGRES_USER"),
-        password=os.environ.get("POSTGRES_PASSWORD"),
-        host=os.environ.get("POSTGRES_HOST"),
-        port=os.environ.get("POSTGRES_PORT"),
-        db=os.environ.get("POSTGRES_DB"),
+        username=config["username"],
+        password=config["password"],
+        host=config["host"],
+        port=config["port"],
+        db=config["database"],
     )
 
     engine = create_engine(connection_uri)
