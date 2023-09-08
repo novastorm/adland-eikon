@@ -29,12 +29,20 @@ def extract(data_path):
 
 def transform(data):
     total_experiments_per_user = data['user_experiments_df'].groupby("user_id").agg(
-        {"experiment_id": {len}}
+        number_of_experiments=("experiment_id", len)
     ).reset_index()
+    total_experiments_per_user = pd.merge(
+        total_experiments_per_user, data['users_df'],
+        on="user_id", how="left"
+    )[["user_id", "name", "number_of_experiments"]]
     logging.debug("total_experiments_per_user")
     logging.debug(total_experiments_per_user)
 
-    avg_experiments_per_user = total_experiments_per_user["experiment_id"].mean()
+    avg_experiments_per_user = pd.DataFrame(
+        {
+            "avg_experiments_per_user": [total_experiments_per_user["number_of_experiments"].mean()]
+        }
+    )
     logging.debug("avg_experiments_per_user")
     logging.debug(avg_experiments_per_user)
 
@@ -53,7 +61,7 @@ def transform(data):
     a_filter = data['compounds_df']["compound_id"].values == int(
         most_experimented_compound_id
     )
-    most_experimented_compound = data['compounds_df'][a_filter]
+    most_experimented_compound = data['compounds_df'][a_filter].reset_index()
 
     logging.debug("most_experimented_compound")
     logging.debug(most_experimented_compound)

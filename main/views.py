@@ -11,3 +11,7 @@ def trigger_etl():
     # Trigger your ETL process here
     etl.delay()
     return jsonify({"message": "ETL process started"}), 200
+
+@main_blueprint.route("/report", methods=["GET"])
+def report():
+    pass
