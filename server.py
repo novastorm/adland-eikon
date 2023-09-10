@@ -1,9 +1,12 @@
+import logging
 import os
 
 from flask import Flask
 
 
 def create_app():
+    logging.basicConfig(level=logging.WARNING)
+
     app = Flask(__name__)
 
     app.config["BASE_DIR"] = os.path.dirname(__file__)

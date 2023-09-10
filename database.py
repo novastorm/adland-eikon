@@ -16,7 +16,6 @@ config = {
 def connect_db():
     logging.info("Connecting to database")
 
-    logging.info("Config: {}".format(config))
     connection_uri = "postgresql://{username}:{password}@{host}:{port}/{db}".format(
         username=config["username"],
         password=config["password"],

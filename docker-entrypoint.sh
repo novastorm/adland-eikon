@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-python manage.py run -h 0.0.0.0 -p 8001
+
+gunicorn --bind 0.0.0.0:8001 manage:app
