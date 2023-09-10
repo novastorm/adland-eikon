@@ -24,7 +24,9 @@ docker compose build
 curl localhost:9000/trigger_etl -X POST
 ```
 
-##### ETL Process
+<details>
+<summary>ETL Process Sequence Diagram</summary>
+
 ```mermaid
 sequenceDiagram
     actor console as Console
@@ -40,12 +42,16 @@ sequenceDiagram
     celery->>database: load feature data
 ```
 
+</details>
+
 #### Fecth Report Data
 ```text
 curl localhost:9000/report
 ```
 
-##### Report Data
+<details>
+<summary>Report Sequence Diagram</summary>
+
 ```mermaid
 sequenceDiagram
     actor console as Console
@@ -58,3 +64,4 @@ sequenceDiagram
     main->>main: format data for output
     main->>console: return formatted data
 ```
+</details>

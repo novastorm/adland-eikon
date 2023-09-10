@@ -5,7 +5,7 @@ from flask import Flask
 
 
 def create_app():
-    logging.basicConfig(level=logging.WARNING)
+    logging.basicConfig(level=logging.DEBUG)
 
     app = Flask(__name__)
 

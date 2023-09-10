@@ -1,9 +1,9 @@
 import os
 
 DATA_DIR = os.getenv("DATA_DIR", "data")
-BROKER_URL = os.getenv("BROKER_URL", "redis://localhost:6379/0")
-RESULT_BACKEND = os.getenv("RESULT_BACKEND", "redis://localhost:6379/0")
-CELERY_TASKS_ALWAYS_EAGER = os.getenv("CELERY_TASKS_ALWAYS_EAGER", False)
+broker_url = os.getenv("broker_url", "redis://localhost:6379/0")
+result_backend = os.getenv("result_backend", "redis://localhost:6379/0")
+task_always_eager = os.getenv("task_always_eager", False)
 POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
 POSTGRES_PORT = os.getenv("POSTGRES_PORT", 5432)
 POSTGRES_USER = os.getenv("POSTGRES_USERNAME", "postgres")

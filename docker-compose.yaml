@@ -14,40 +14,39 @@ services:
       - APISERVER_INTERNAL_PORT
       - FLASK_DEBUG=1
       - APP_SETTINGS=config.development
-      - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
-      - CELERY_ALWAYS_EAGER=True
+#      - broker_url=redis://:${REDIS_PASSWORD}@redis:6379/0
+#      - result_backend=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - task_always_eager=True
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=postgres
     depends_on:
-      redis:
-        condition: service_started
+#      redis:
+#        condition: service_started
       postgres:
         condition: service_started
 
-  celery-worker:
-    build: .
-    image: eikon-etl
-    entrypoint: celery -A tasks worker --loglevel=debug
-#    volumes:
-#      - .:/app
-    environment:
-      - FLASK_DEBUG=1
-      - APP_SETTINGS=config.development
-      - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
-      - CELERY_ALWAYS_EAGER=True
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=postgres
-    depends_on:
-      - apiserver
-      - redis
+#  celery-worker:
+#    build: .
+#    image: eikon-etl
+#    entrypoint: celery -A tasks worker --loglevel=debug
+##    volumes:
+##      - .:/app
+#    environment:
+#      - FLASK_DEBUG=1
+#      - APP_SETTINGS=config.development
+#      - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+#      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
+#      - POSTGRES_HOST=postgres
+#      - POSTGRES_PORT=5432
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=password
+#      - POSTGRES_DB=postgres
+#    depends_on:
+#      - apiserver
+#      - redis
 
   reverse-proxy:
     image: nginx:1.21.4
@@ -90,18 +89,18 @@ services:
     environment:
       POSTGRES_PASSWORD: "password"
 
-  redis:
-    image: redis:5.0.14-alpine
-    # redis defaults to RDB persistence (https://redis.io/topics/persistence)
-    # consider using AOF (--appendonly yes) if people still report issues with cached data
-    # disappearing after they restart their docker services
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
-    volumes:
-      - type: volume
-        source: redis-volume
-        target: /data
-    ports:
-      - ${REDIS_EXTERNAL_PORT}:6379
+#  redis:
+#    image: redis:5.0.14-alpine
+#    # redis defaults to RDB persistence (https://redis.io/topics/persistence)
+#    # consider using AOF (--appendonly yes) if people still report issues with cached data
+#    # disappearing after they restart their docker services
+#    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+#    volumes:
+#      - type: volume
+#        source: redis-volume
+#        target: /data
+#    ports:
+#      - ${REDIS_EXTERNAL_PORT}:6379
 
 networks:
   default:
